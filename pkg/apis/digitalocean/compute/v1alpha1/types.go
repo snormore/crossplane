@@ -35,11 +35,24 @@ const (
 // KubernetesClusterSpec
 type KubernetesClusterSpec struct {
 	godo.KubernetesClusterCreateRequest
+
+	// Kubernetes object references
+	ClaimRef            *corev1.ObjectReference      `json:"claimRef,omitempty"`
+	ClassRef            *corev1.ObjectReference      `json:"classRef,omitempty"`
+	ConnectionSecretRef *corev1.LocalObjectReference `json:"connectionSecretRef,omitempty"`
+	ProviderRef         corev1.LocalObjectReference  `json:"providerRef,omitempty"`
+
+	// ReclaimPolicy identifies how to handle the cloud resource after the deletion of this type
+	ReclaimPolicy corev1alpha1.ReclaimPolicy `json:"reclaimPolicy,omitempty"`
 }
 
 // KubernetesClusterStatus
 type KubernetesClusterStatus struct {
-	godo.KubernetesClusterStatus
+	corev1alpha1.ConditionedStatus
+	corev1alpha1.BindingStatusPhase
+	ClusterName string `json:"clusterName"`
+	Endpoint    string `json:"endpoint"`
+	State       string `json:"state,omitempty"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -93,28 +106,28 @@ func (g *KubernetesCluster) OwnerReference() metav1.OwnerReference {
 	return *util.ObjectToOwnerReference(g.ObjectReference())
 }
 
-// func (g *KubernetesCluster) ConnectionSecret() *corev1.Secret {
-// 	return &corev1.Secret{
-// 		ObjectMeta: metav1.ObjectMeta{
-// 			Namespace:       g.Namespace,
-// 			Name:            g.ConnectionSecretName(),
-// 			OwnerReferences: []metav1.OwnerReference{g.OwnerReference()},
-// 		},
-// 	}
-// }
+func (g *KubernetesCluster) ConnectionSecret() *corev1.Secret {
+	return &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace:       g.Namespace,
+			Name:            g.ConnectionSecretName(),
+			OwnerReferences: []metav1.OwnerReference{g.OwnerReference()},
+		},
+	}
+}
 
-// // ConnectionSecretName returns a secret name from the reference
-// func (g *KubernetesCluster) ConnectionSecretName() string {
-// 	if g.Spec.ConnectionSecretRef == nil {
-// 		g.Spec.ConnectionSecretRef = &corev1.LocalObjectReference{
-// 			Name: g.Name,
-// 		}
-// 	} else if g.Spec.ConnectionSecretRef.Name == "" {
-// 		g.Spec.ConnectionSecretRef.Name = g.Name
-// 	}
+// ConnectionSecretName returns a secret name from the reference
+func (g *KubernetesCluster) ConnectionSecretName() string {
+	if g.Spec.ConnectionSecretRef == nil {
+		g.Spec.ConnectionSecretRef = &corev1.LocalObjectReference{
+			Name: g.Name,
+		}
+	} else if g.Spec.ConnectionSecretRef.Name == "" {
+		g.Spec.ConnectionSecretRef.Name = g.Name
+	}
 
-// 	return g.Spec.ConnectionSecretRef.Name
-// }
+	return g.Spec.ConnectionSecretRef.Name
+}
 
 // State returns rds instance state value saved in the status (could be empty)
 func (g *KubernetesCluster) State() string {
@@ -126,16 +139,16 @@ func (g *KubernetesCluster) IsAvailable() bool {
 	return g.State() == ClusterStateRunning
 }
 
-// // IsBound
-// func (g *KubernetesCluster) IsBound() bool {
-// 	return g.Status.Phase == corev1alpha1.BindingStateBound
-// }
+// IsBound
+func (g *KubernetesCluster) IsBound() bool {
+	return g.Status.Phase == corev1alpha1.BindingStateBound
+}
 
-// // SetBound
-// func (g *KubernetesCluster) SetBound(state bool) {
-// 	if state {
-// 		g.Status.Phase = corev1alpha1.BindingStateBound
-// 	} else {
-// 		g.Status.Phase = corev1alpha1.BindingStateUnbound
-// 	}
-// }
+// SetBound
+func (g *KubernetesCluster) SetBound(state bool) {
+	if state {
+		g.Status.Phase = corev1alpha1.BindingStateBound
+	} else {
+		g.Status.Phase = corev1alpha1.BindingStateUnbound
+	}
+}

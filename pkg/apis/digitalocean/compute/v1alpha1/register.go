@@ -21,7 +21,7 @@ limitations under the License.
 // +k8s:deepcopy-gen=package,register
 // +k8s:conversion-gen=github.com/crossplaneio/crossplane/pkg/gcp/apis/gcp/compute
 // +k8s:defaulter-gen=TypeMeta
-// +groupName=compute.gcp.crossplane.io
+// +groupName=compute.digitalocean.crossplane.io
 package v1alpha1
 
 import (
@@ -33,7 +33,7 @@ const (
 	Group                           = "compute.digitalocean.crossplane.io"
 	Version                         = "v1alpha1"
 	APIVersion                      = Group + "/" + Version
-	KubernetesClusterKind           = "gkecluster"
+	KubernetesClusterKind           = "kubernetescluster"
 	KubernetesClusterKindAPIVersion = KubernetesClusterKind + "." + APIVersion
 )
 

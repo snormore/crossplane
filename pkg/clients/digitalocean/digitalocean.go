@@ -62,6 +62,36 @@ func GetClient(ctx context.Context, creds *Credentials) (*godo.Client, error) {
 	return client, nil
 }
 
+// IsErrorNotFound gets a value indicating whether the given error represents a "not found" response from the Google API
+func IsErrorNotFound(err error) bool {
+	return false
+	// if err == nil {
+	// 	return false
+	// }
+	// googleapiErr, ok := err.(*googleapi.Error)
+	// return ok && googleapiErr.Code == http.StatusNotFound
+}
+
+// IsErrorAlreadyExists gets a value indicating whether the given error represents a "conflict" response from the Google API
+func IsErrorAlreadyExists(err error) bool {
+	return false
+	// if err == nil {
+	// 	return false
+	// }
+	// googleapiErr, ok := err.(*googleapi.Error)
+	// return googleapiErr.Code == http.StatusConflict
+}
+
+// IsErrorBadRequest gets a value indicating whether the given error represents a "bad request" response from the Google API
+func IsErrorBadRequest(err error) bool {
+	return false
+	// if err == nil {
+	// 	return false
+	// }
+	// googleapiErr, ok := err.(*googleapi.Error)
+	// return ok && googleapiErr.Code == http.StatusBadRequest
+}
+
 // ProviderCredentials return DO credentials based on the provider's credentials secret data
 func ProviderCredentials(client kubernetes.Interface, p *digitaloceanv1alpha1.Provider) (*Credentials, error) {
 	// retrieve provider secret data

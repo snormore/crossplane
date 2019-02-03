@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/crossplaneio/crossplane/pkg/test"
+	"github.com/digitalocean/godo"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -57,21 +58,22 @@ func TestMain(m *testing.M) {
 	t.StopAndExit(m.Run())
 }
 
-func TestGKECluster(t *testing.T) {
+func TestKubernetesCluster(t *testing.T) {
 	key := types.NamespacedName{Name: name, Namespace: namespace}
-	created := &GKECluster{
+	created := &KubernetesCluster{
 		ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace},
-		Spec: GKEClusterSpec{
-			ClusterVersion: "1.1.1",
-			NumNodes:       int64(1),
-			Zone:           "us-central1-a",
-			MachineType:    "n1-standard-1",
+		Spec: KubernetesClusterSpec{
+			KubernetesClusterCreateRequest: godo.KubernetesClusterCreateRequest{
+				Name:        name,
+				VersionSlug: "1.1.1",
+				RegionSlug:  "us-central1-a",
+			},
 		},
 	}
 	g := NewGomegaWithT(t)
 
 	// Test Create
-	fetched := &GKECluster{}
+	fetched := &KubernetesCluster{}
 	g.Expect(c.Create(ctx, created)).NotTo(HaveOccurred())
 
 	g.Expect(c.Get(ctx, key, fetched)).NotTo(HaveOccurred())

@@ -22,11 +22,13 @@ import (
 	"log"
 
 	corev1alpha1 "github.com/crossplaneio/crossplane/pkg/apis/core/v1alpha1"
-	digitaloceancomputev1alpha1 "github.com/crossplaneio/crossplane/pkg/apis/digitalocean/compute/v1alpha1"
+	computev1alpha1 "github.com/crossplaneio/crossplane/pkg/apis/digitalocean/compute/v1alpha1"
 	digitaloceanv1alpha1 "github.com/crossplaneio/crossplane/pkg/apis/digitalocean/v1alpha1"
 	"github.com/crossplaneio/crossplane/pkg/clients/digitalocean"
 	"github.com/crossplaneio/crossplane/pkg/clients/digitalocean/k8s"
 	"github.com/crossplaneio/crossplane/pkg/util"
+	"github.com/digitalocean/godo"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
@@ -70,10 +72,10 @@ type Reconciler struct {
 	kubeclient kubernetes.Interface
 	recorder   record.EventRecorder
 
-	connect func(*digitaloceancomputev1alpha1.KubernetesCluster) (k8s.Client, error)
-	create  func(*digitaloceancomputev1alpha1.KubernetesCluster, k8s.Client) (reconcile.Result, error)
-	sync    func(*digitaloceancomputev1alpha1.KubernetesCluster, k8s.Client) (reconcile.Result, error)
-	delete  func(*digitaloceancomputev1alpha1.KubernetesCluster, k8s.Client) (reconcile.Result, error)
+	connect func(*computev1alpha1.KubernetesCluster) (k8s.Client, error)
+	create  func(*computev1alpha1.KubernetesCluster, k8s.Client) (reconcile.Result, error)
+	sync    func(*computev1alpha1.KubernetesCluster, k8s.Client) (reconcile.Result, error)
+	delete  func(*computev1alpha1.KubernetesCluster, k8s.Client) (reconcile.Result, error)
 }
 
 // newReconciler returns a new reconcile.Reconciler
@@ -100,7 +102,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to Provider
-	err = c.Watch(&source.Kind{Type: &digitaloceancomputev1alpha1.KubernetesCluster{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &computev1alpha1.KubernetesCluster{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -108,43 +110,43 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	return nil
 }
 
-// // fail - helper function to set fail condition with reason and message
-// func (r *Reconciler) fail(instance *digitaloceancomputev1alpha1.KubernetesCluster, reason, msg string) (reconcile.Result, error) {
-// 	instance.Status.UnsetAllConditions()
-// 	instance.Status.SetFailed(reason, msg)
-// 	return resultRequeue, r.Update(context.TODO(), instance)
-// }
+// fail - helper function to set fail condition with reason and message
+func (r *Reconciler) fail(instance *computev1alpha1.KubernetesCluster, reason, msg string) (reconcile.Result, error) {
+	instance.Status.UnsetAllConditions()
+	instance.Status.SetFailed(reason, msg)
+	return resultRequeue, r.Update(context.TODO(), instance)
+}
 
-// // connectionSecret return secret object for cluster instance
-// func (r *Reconciler) connectionSecret(instance *computev1alpha1.KubernetesCluster, cluster *godo.KubernetesCluster) (*corev1.Secret, error) {
-// 	secret := instance.ConnectionSecret()
+// connectionSecret return secret object for cluster instance
+func (r *Reconciler) connectionSecret(instance *computev1alpha1.KubernetesCluster, cluster *godo.KubernetesCluster) (*corev1.Secret, error) {
+	secret := instance.ConnectionSecret()
 
-// 	data := make(map[string][]byte)
-// 	data[corev1alpha1.ResourceCredentialsSecretEndpointKey] = []byte(cluster.Endpoint)
-// 	data[corev1alpha1.ResourceCredentialsSecretUserKey] = []byte(cluster.MasterAuth.Username)
-// 	data[corev1alpha1.ResourceCredentialsSecretPasswordKey] = []byte(cluster.MasterAuth.Password)
+	data := make(map[string][]byte)
+	data[corev1alpha1.ResourceCredentialsSecretEndpointKey] = []byte(cluster.Endpoint)
+	// data[corev1alpha1.ResourceCredentialsSecretUserKey] = []byte(cluster.MasterAuth.Username)
+	// data[corev1alpha1.ResourceCredentialsSecretPasswordKey] = []byte(cluster.MasterAuth.Password)
 
-// 	if val, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClusterCaCertificate); err != nil {
-// 		return nil, err
-// 	} else {
-// 		data[corev1alpha1.ResourceCredentialsSecretCAKey] = val
-// 	}
-// 	if val, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClientCertificate); err != nil {
-// 		return nil, err
-// 	} else {
-// 		data[corev1alpha1.ResourceCredentialsSecretClientCertKey] = val
-// 	}
-// 	if val, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClientKey); err != nil {
-// 		return nil, err
-// 	} else {
-// 		data[corev1alpha1.ResourceCredentialsSecretClientKeyKey] = val
-// 	}
-// 	secret.Data = data
+	// if val, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClusterCaCertificate); err != nil {
+	// 	return nil, err
+	// } else {
+	// 	data[corev1alpha1.ResourceCredentialsSecretCAKey] = val
+	// }
+	// if val, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClientCertificate); err != nil {
+	// 	return nil, err
+	// } else {
+	// 	data[corev1alpha1.ResourceCredentialsSecretClientCertKey] = val
+	// }
+	// if val, err := base64.StdEncoding.DecodeString(cluster.MasterAuth.ClientKey); err != nil {
+	// 	return nil, err
+	// } else {
+	// 	data[corev1alpha1.ResourceCredentialsSecretClientKeyKey] = val
+	// }
+	secret.Data = data
 
-// 	return secret, nil
-// }
+	return secret, nil
+}
 
-func (r *Reconciler) _connect(instance *digitaloceancomputev1alpha1.KubernetesCluster) (k8s.Client, error) {
+func (r *Reconciler) _connect(instance *computev1alpha1.KubernetesCluster) (k8s.Client, error) {
 	// Fetch Provider
 	p := &digitaloceanv1alpha1.Provider{}
 	providerNamespacedName := types.NamespacedName{
@@ -169,7 +171,7 @@ func (r *Reconciler) _connect(instance *digitaloceancomputev1alpha1.KubernetesCl
 	return k8s.NewClusterClient(creds)
 }
 
-func (r *Reconciler) _create(instance *digitaloceancomputev1alpha1.KubernetesCluster, client k8s.Client) (reconcile.Result, error) {
+func (r *Reconciler) _create(instance *computev1alpha1.KubernetesCluster, client k8s.Client) (reconcile.Result, error) {
 	clusterName := fmt.Sprintf("%s%s", clusterNamePrefix, instance.UID)
 
 	_, err := client.CreateCluster(clusterName, instance.Spec)
@@ -182,7 +184,7 @@ func (r *Reconciler) _create(instance *digitaloceancomputev1alpha1.KubernetesClu
 		return r.fail(instance, errorCreateCluster, err.Error())
 	}
 
-	instance.Status.State = digitaloceancomputev1alpha1.ClusterStateProvisioning
+	instance.Status.State = computev1alpha1.ClusterStateProvisioning
 
 	instance.Status.UnsetAllConditions()
 	instance.Status.SetCreating()
@@ -191,13 +193,13 @@ func (r *Reconciler) _create(instance *digitaloceancomputev1alpha1.KubernetesClu
 	return resultRequeue, r.Update(ctx, instance)
 }
 
-func (r *Reconciler) _sync(instance *digitaloceancomputev1alpha1.KubernetesCluster, client k8s.Client) (reconcile.Result, error) {
-	cluster, err := client.GetCluster(instance.Spec.Zone, instance.Status.ClusterName)
+func (r *Reconciler) _sync(instance *computev1alpha1.KubernetesCluster, client k8s.Client) (reconcile.Result, error) {
+	cluster, err := client.GetCluster(instance.Status.ClusterName)
 	if err != nil {
 		return r.fail(instance, errorSyncCluster, err.Error())
 	}
 
-	if cluster.Status != digitaloceancomputev1alpha1.ClusterStateRunning {
+	if cluster.Status.State != computev1alpha1.ClusterStateRunning {
 		return resultRequeue, nil
 	}
 
@@ -214,7 +216,7 @@ func (r *Reconciler) _sync(instance *digitaloceancomputev1alpha1.KubernetesClust
 
 	// update resource status
 	instance.Status.Endpoint = cluster.Endpoint
-	instance.Status.State = digitaloceancomputev1alpha1.ClusterStateRunning
+	instance.Status.State = computev1alpha1.ClusterStateRunning
 	instance.Status.UnsetAllConditions()
 	instance.Status.SetReady()
 
@@ -224,9 +226,9 @@ func (r *Reconciler) _sync(instance *digitaloceancomputev1alpha1.KubernetesClust
 }
 
 // _delete check reclaim policy and if needed delete the k8s cluster resource
-func (r *Reconciler) _delete(instance *digitaloceancomputev1alpha1.KubernetesCluster, client k8s.Client) (reconcile.Result, error) {
+func (r *Reconciler) _delete(instance *computev1alpha1.KubernetesCluster, client k8s.Client) (reconcile.Result, error) {
 	if instance.Spec.ReclaimPolicy == corev1alpha1.ReclaimDelete {
-		if err := client.DeleteCluster(instance.Spec.Zone, instance.Status.ClusterName); err != nil {
+		if err := client.DeleteCluster(instance.Status.ClusterName); err != nil {
 			return r.fail(instance, errorDeleteCluster, err.Error())
 		}
 	}
@@ -238,9 +240,9 @@ func (r *Reconciler) _delete(instance *digitaloceancomputev1alpha1.KubernetesClu
 // Reconcile reads that state of the cluster for a Provider object and makes changes based on the state read
 // and what is in the Provider.Spec
 func (r *Reconciler) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	log.Printf("reconciling %s: %v", digitaloceancomputev1alpha1.KubernetesClusterKindAPIVersion, request)
+	log.Printf("reconciling %s: %v", computev1alpha1.KubernetesClusterKindAPIVersion, request)
 	// Fetch the Provider instance
-	instance := &digitaloceancomputev1alpha1.KubernetesCluster{}
+	instance := &computev1alpha1.KubernetesCluster{}
 	err := r.Get(ctx, request.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {

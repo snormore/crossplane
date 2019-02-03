@@ -27,8 +27,8 @@ import (
 // Client interface to perform cluster operations
 type Client interface {
 	CreateCluster(string, computev1alpha1.KubernetesClusterSpec) (*godo.KubernetesCluster, error)
-	GetCluster(zone, name string) (*godo.KubernetesCluster, error)
-	DeleteCluster(zone, name string) error
+	GetCluster(name string) (*godo.KubernetesCluster, error)
+	DeleteCluster(name string) error
 }
 
 // ClusterClient implementation
@@ -38,32 +38,39 @@ type ClusterClient struct {
 }
 
 // NewClusterClient return new instance of the Client based on credentials
-func NewClusterClient(creds *digitalocean.Credentials) (*ClusterClient, error) {
+func NewClusterClient(creds *digitalocean.Credentials) (Client, error) {
 	client, err := digitalocean.GetClient(context.Background(), creds)
 	if err != nil {
 		return nil, err
 	}
 	return &ClusterClient{
+		creds:  creds,
 		client: client,
 	}, nil
 }
 
 // CreateCluster provisions a new Kubernetes cluster.
-func (c *ClusterClient) CreateCluster(name string, request *godo.KubernetesClusterCreateRequest) (*godo.KubernetesCluster, error) {
+func (c *ClusterClient) CreateCluster(name string, spec computev1alpha1.KubernetesClusterSpec) (*godo.KubernetesCluster, error) {
+	request := &godo.KubernetesClusterCreateRequest{
+		Name:        spec.Name,
+		RegionSlug:  spec.RegionSlug,
+		VersionSlug: spec.VersionSlug,
+		Tags:        spec.Tags,
+	}
 	if _, _, err := c.client.Kubernetes.Create(context.TODO(), request); err != nil {
 		return nil, err
 	}
-	return c.GetCluster(request.RegionSlug, name)
+	return c.GetCluster(name)
 }
 
 // GetCluster retrieves a Kubernetes Cluster based on provided name.
-func (c *ClusterClient) GetCluster(zone, name string) (*godo.KubernetesCluster, error) {
+func (c *ClusterClient) GetCluster(name string) (*godo.KubernetesCluster, error) {
 	cluster, _, err := c.client.Kubernetes.Get(context.TODO(), name)
 	return cluster, err
 }
 
 // DeleteCluster in the given zone with the given name.
-func (c *ClusterClient) DeleteCluster(zone, name string) error {
+func (c *ClusterClient) DeleteCluster(name string) error {
 	_, err := c.client.Kubernetes.Delete(context.TODO(), name)
 	return err
 }

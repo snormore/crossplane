@@ -19,5 +19,5 @@ limitations under the License.
 // +k8s:deepcopy-gen=package,register
 // +k8s:conversion-gen=github.com/crossplaneio/crossplane/pkg/apis/gcp/compute
 // +k8s:defaulter-gen=TypeMeta
-// +groupName=compute.gcp.crossplane.io
+// +groupName=compute.digitalocean.crossplane.io
 package v1alpha1
