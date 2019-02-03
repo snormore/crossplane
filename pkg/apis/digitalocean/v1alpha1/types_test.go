@@ -21,12 +21,7 @@ import (
 	"log"
 	"testing"
 
-	"k8s.io/apimachinery/pkg/types"
-
 	"github.com/crossplaneio/crossplane/pkg/test"
-	"github.com/onsi/gomega"
-	"k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -58,42 +53,4 @@ func TestMain(m *testing.M) {
 	}
 
 	t.StopAndExit(m.Run())
-}
-
-func TestStorageProvider(t *testing.T) {
-	key := types.NamespacedName{Name: name, Namespace: namespace}
-	created := &Provider{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: ProviderSpec{
-			Secret: v1.SecretKeySelector{
-				LocalObjectReference: v1.LocalObjectReference{Name: "u-235"},
-				Key:                  secretDataKey,
-			},
-			ProjectID:           "manhattan",
-			RequiredPermissions: []string{"crate", "update", "delete"},
-		},
-	}
-	g := gomega.NewGomegaWithT(t)
-
-	// Test Create
-	g.Expect(c.Create(ctx, created)).NotTo(gomega.HaveOccurred())
-
-	fetched := &Provider{}
-	g.Expect(c.Get(ctx, key, fetched)).NotTo(gomega.HaveOccurred())
-	g.Expect(fetched).To(gomega.Equal(created))
-
-	// Test Updating the Labels
-	updated := fetched.DeepCopy()
-	updated.Labels = map[string]string{"hello": "world"}
-	g.Expect(c.Update(ctx, updated)).NotTo(gomega.HaveOccurred())
-
-	g.Expect(c.Get(ctx, key, fetched)).NotTo(gomega.HaveOccurred())
-	g.Expect(fetched).To(gomega.Equal(updated))
-
-	// Test Delete
-	g.Expect(c.Delete(ctx, fetched)).NotTo(gomega.HaveOccurred())
-	g.Expect(c.Get(ctx, key, fetched)).To(gomega.HaveOccurred())
 }

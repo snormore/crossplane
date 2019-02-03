@@ -59,7 +59,7 @@ type KubernetesClusterStatus struct {
 
 // KubernetesCluster is the Schema for the instances API
 // +k8s:openapi-gen=true
-// +groupName=compute.gcp
+// +groupName=compute.digitalocean
 // +kubebuilder:printcolumn:name="STATUS",type="string",JSONPath=".status.state"
 // +kubebuilder:printcolumn:name="CLUSTER-NAME",type="string",JSONPath=".status.clusterName"
 // +kubebuilder:printcolumn:name="ENDPOINT",type="string",JSONPath=".status.endpoint"

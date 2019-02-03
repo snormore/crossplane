@@ -14,10 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package v1alpha1 contains API Schema definitions for the gcp v1alpha1 API group
+// Package v1alpha1 contains API Schema definitions for the DO v1alpha1 API group
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen=package,register
-// +k8s:conversion-gen=github.com/crossplaneio/crossplane/pkg/apis/gcp
+// +k8s:conversion-gen=github.com/crossplaneio/crossplane/pkg/apis/digitalocean
 // +k8s:defaulter-gen=TypeMeta
 // +groupName=digitalocean.crossplane.io
 package v1alpha1

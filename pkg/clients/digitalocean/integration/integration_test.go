@@ -18,25 +18,25 @@ limitations under the License.
 // digitalocean project
 package integration
 
-import (
-	"testing"
+// import (
+// 	"testing"
 
-	. "github.com/crossplaneio/crossplane/pkg/clients/digitalocean"
-	. "github.com/onsi/gomega"
-)
+// 	. "github.com/crossplaneio/crossplane/pkg/clients/digitalocean"
+// 	. "github.com/onsi/gomega"
+// )
 
-func TestProject(t *testing.T) {
-	g, creds := CredsOrSkip(t, DefaultScope)
-	p, err := Project(creds)
-	g.Expect(err).NotTo(HaveOccurred())
-	g.Expect(p.ID).To(Equal(creds.ProjectID))
-}
+// func TestProject(t *testing.T) {
+// 	g, creds := CredsOrSkip(t, DefaultScope)
+// 	p, err := Project(creds)
+// 	g.Expect(err).NotTo(HaveOccurred())
+// 	g.Expect(p.ID).To(Equal(creds.ProjectID))
+// }
 
-func TestTestPermissions(t *testing.T) {
-	g, creds := CredsOrSkip(t, DefaultScope)
-	g.Expect(TestPermissions(creds, []string{})).NotTo(HaveOccurred())
-	g.Expect(TestPermissions(creds, []string{"foo.enterprises.manage"})).To(HaveOccurred())
-	// comment out and update assertions below
-	//g.Expect(TestPermissions(creds, []string{"cloudsql.instances.list"})).NotTo(HaveOccurred())
-	//g.Expect(TestPermissions(creds, []string{"compute.instances.list"})).NotTo(HaveOccurred())
-}
+// func TestTestPermissions(t *testing.T) {
+// 	g, creds := CredsOrSkip(t, DefaultScope)
+// 	g.Expect(TestPermissions(creds, []string{})).NotTo(HaveOccurred())
+// 	g.Expect(TestPermissions(creds, []string{"foo.enterprises.manage"})).To(HaveOccurred())
+// 	// comment out and update assertions below
+// 	//g.Expect(TestPermissions(creds, []string{"cloudsql.instances.list"})).NotTo(HaveOccurred())
+// 	//g.Expect(TestPermissions(creds, []string{"compute.instances.list"})).NotTo(HaveOccurred())
+// }

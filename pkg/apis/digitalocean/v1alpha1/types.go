@@ -31,9 +31,6 @@ type ProviderSpec struct {
 
 	// GCP ProjectID (name)
 	ProjectID string `json:"projectID"`
-
-	// RequiredPermissions  - list of granted GCP permissions this provider's service account is expected to have
-	RequiredPermissions []string `json:"requiredPermissions,omitempty"`
 }
 
 // ProviderStatus
