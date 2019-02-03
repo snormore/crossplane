@@ -152,6 +152,14 @@
   version = "v3.2.0"
 
 [[projects]]
+  digest = "1:94dea3c2ffc2b8417314c9dbb3608cc4dc70999ed44de552af85645ff66e0dd3"
+  name = "github.com/digitalocean/godo"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "360ee5cab86ffe07b3d5009a3bbb658862c55cf8"
+  version = "v1.7.3"
+
+[[projects]]
   digest = "1:e608bc2d867c3ded40ccea5417715393a50704ac24004afa87431a0e1976e50d"
   name = "github.com/dimchansky/utfbom"
   packages = ["."]
@@ -258,6 +266,14 @@
   packages = ["."]
   pruneopts = "UT"
   revision = "4030bb1f1f0c35b30ca7009e9ebd06849dd45306"
+
+[[projects]]
+  digest = "1:a63cff6b5d8b95638bfe300385d93b2a6d9d687734b863da8e09dc834510a690"
+  name = "github.com/google/go-querystring"
+  packages = ["query"]
+  pruneopts = "UT"
+  revision = "44c6ddd0a2342c386950e880b658017258da92fc"
+  version = "v1.0.0"
 
 [[projects]]
   branch = "master"
@@ -580,7 +596,15 @@
   version = "v1.0.3"
 
 [[projects]]
-  digest = "1:86b11d1e4dd05cd44d14b1e30b0497f98a37f696e8740ae88383de56d766cb34"
+  branch = "master"
+  digest = "1:595e123593925253dd02152777ddb8cd42300c4f61e783e163b053802547c47c"
+  name = "github.com/tent/http-link-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ac974c61c2f990f4115b119354b5e0b47550e888"
+
+[[projects]]
+  digest = "1:2ae8314c44cd413cfdb5b1df082b350116dd8d2fff973e62c01b285b7affd89e"
   name = "go.opencensus.io"
   packages = [
     ".",
@@ -1267,6 +1291,7 @@
     "github.com/aws/aws-sdk-go-v2/service/s3",
     "github.com/aws/aws-sdk-go-v2/service/s3/s3iface",
     "github.com/aws/aws-sdk-go-v2/service/sts",
+    "github.com/digitalocean/godo",
     "github.com/ghodss/yaml",
     "github.com/go-ini/ini",
     "github.com/go-test/deep",
