@@ -16,17 +16,17 @@ limitations under the License.
 
 package k8s
 
-// import (
-// 	"testing"
+import (
+	"testing"
 
-// 	. "github.com/onsi/gomega"
-// 	"golang.org/x/oauth2/google"
-// )
+	"github.com/crossplaneio/crossplane/pkg/clients/digitalocean"
+	. "github.com/onsi/gomega"
+)
 
-// func TestNewClusterClient(t *testing.T) {
-// 	g := NewGomegaWithT(t)
+func TestNewClusterClient(t *testing.T) {
+	g := NewGomegaWithT(t)
 
-// 	c, err := NewClusterClient(&google.Credentials{})
-// 	g.Expect(err).NotTo(HaveOccurred())
-// 	g.Expect(c).NotTo(BeNil())
-// }
+	c, err := NewClusterClient(&digitalocean.Credentials{})
+	g.Expect(err).NotTo(HaveOccurred())
+	g.Expect(c).NotTo(BeNil())
+}
