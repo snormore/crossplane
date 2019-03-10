@@ -604,7 +604,7 @@
   revision = "ac974c61c2f990f4115b119354b5e0b47550e888"
 
 [[projects]]
-  digest = "1:2ae8314c44cd413cfdb5b1df082b350116dd8d2fff973e62c01b285b7affd89e"
+  digest = "1:86b11d1e4dd05cd44d14b1e30b0497f98a37f696e8740ae88383de56d766cb34"
   name = "go.opencensus.io"
   packages = [
     ".",
